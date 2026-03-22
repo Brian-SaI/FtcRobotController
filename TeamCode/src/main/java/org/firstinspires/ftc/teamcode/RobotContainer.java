@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.SubsystemTest;
 
-@TeleOp
+@TeleOp(name = "Command Testing", group = "Experimental")
 public class RobotContainer extends CommandOpMode {
     private SubsystemTest subsystemTest;
     private GamepadEx gamepad;
