@@ -28,6 +28,9 @@
  */
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -56,7 +59,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  */
 @TeleOp(name = "Robot: Field Relative Swerve Drive", group = "Robot")
 @Disabled
-public class CommandSwerveDriveTrain extends OpMode {
+public class CommandSwerveDriveTrain extends SubsystemBase {
     // drive motors
     DcMotorEx frontLeftDrive;
     DcMotorEx frontRightDrive;
@@ -92,8 +95,7 @@ public class CommandSwerveDriveTrain extends OpMode {
     public static double BR_kD = 0;
     public static double BR_kF = 11.65;
 
-    @Override
-    public void init() {
+    public CommandSwerveDriveTrain() {
         // sets up all the drive motors
         frontLeftDrive = hardwareMap.get(DcMotorEx.class, "front_left_drive");
         frontRightDrive = hardwareMap.get(DcMotorEx.class, "front_right_drive");
@@ -138,7 +140,7 @@ public class CommandSwerveDriveTrain extends OpMode {
     }
 
     @Override
-    public void loop() {
+    public void periodic() {
         // TODO: put stuff on the computer Dashboard for tuning and whatnot!
 
     }
@@ -153,43 +155,81 @@ public class CommandSwerveDriveTrain extends OpMode {
         steer(controller);
     }
 
-    public void drive(GamepadEx controller) {
-        // diameter of the wheels, useful for determine robot speed
-        double wheelDiameter = 64.0;
+    public double spinSpeedCalculation(GamepadEx controller) {
+        double maxTurnSpeed = 50;
+
+        // turning should only apply to X-Axis. I think
+        double turnSpeed = controller.getLeftX();
+
+        if (Math.abs(turnSpeed) > 0.05) {
+            return maxTurnSpeed * turnSpeed;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    public double driveSpeedCalc(GamepadEx controller) {
 
         // get the distance between actual left stick point
-        double controllerPower = Math.sqrt(Math.pow((controller.getLeftX() + 0), 2) + Math.pow((controller.getLeftY() + 0), 2));
+        double controllerPower = Math.sqrt(Math.pow((controller.getLeftX()), 2) + Math.pow((controller.getLeftY()), 2));
+
+        double outputSpeed = Math.min(controllerPower, 1);
 
         // multiply the max rotations per second by the controller power (shouldn't need to be positive?)
         // max theoretical motor velocity is 6000RPMs
-        double targetVelocity = 100 * controllerPower;
-
-
+        return 100 * outputSpeed;
+    }
+    public void drive(GamepadEx controller) {
+        double forwardVelocity = driveSpeedCalc(controller);
+        double turnVelocity = spinSpeedCalculation(controller);
+        // diameter of the wheels, useful for determine robot speed
+        double wheelDiameter = 64.0;
         // gives the robot velocity in m/s
-        double robotVelocity = ((wheelDiameter * Math.PI)/1000) * targetVelocity;
+        double robotVelocity = ((wheelDiameter * Math.PI)/1000) * forwardVelocity;
 
-        // sets the motors to run at a given RPS?
-        frontLeftDrive.setVelocity(targetVelocity * 360, AngleUnit.DEGREES);
-        frontRightDrive.setVelocity(targetVelocity * 360, AngleUnit.DEGREES);
-        backLeftDrive.setVelocity(targetVelocity * 360, AngleUnit.DEGREES);
-        backRightDrive.setVelocity(targetVelocity * 360, AngleUnit.DEGREES);
+        // target velocity assuming you're turning left
+        if (turnVelocity < -0) {
+            // turning left
+            frontLeftDrive.setVelocity((forwardVelocity+turnVelocity) * 360, AngleUnit.DEGREES);
+            frontRightDrive.setVelocity((forwardVelocity-turnVelocity) * 360, AngleUnit.DEGREES);
+            backLeftDrive.setVelocity((forwardVelocity+turnVelocity) * 360, AngleUnit.DEGREES);
+            backRightDrive.setVelocity((forwardVelocity-turnVelocity) * 360, AngleUnit.DEGREES);
+        } else if (turnVelocity > 0) {
+            // turning right
+            frontLeftDrive.setVelocity((forwardVelocity-turnVelocity) * 360, AngleUnit.DEGREES);
+            frontRightDrive.setVelocity((forwardVelocity+turnVelocity) * 360, AngleUnit.DEGREES);
+            backLeftDrive.setVelocity((forwardVelocity-turnVelocity) * 360, AngleUnit.DEGREES);
+            backRightDrive.setVelocity((forwardVelocity+turnVelocity) * 360, AngleUnit.DEGREES);
+        } else {
+            // no turning
+            frontLeftDrive.setVelocity(forwardVelocity * 360, AngleUnit.DEGREES);
+            frontRightDrive.setVelocity(forwardVelocity * 360, AngleUnit.DEGREES);
+            backLeftDrive.setVelocity(forwardVelocity * 360, AngleUnit.DEGREES);
+            backRightDrive.setVelocity(forwardVelocity * 360, AngleUnit.DEGREES);
+        }
     }
 
     // steering is just turret math except the field is a joystick
     public void steer(GamepadEx controller) {
         double swerveRotation;
-        // TODO: update the belt ratio for the actual pulley ratio!
-        double beltRatio = 0.003125; // 1 / 320
+        // TODO: update the pulley ratio for the actual pulley ratio!
+        double pulleyRatio = 0.833333333; // 300 / 360
         double targetRotation;
+        // servos like SWYFT tend to have their 0 degrees point be at 0.5, this accounts for that.
+        double normalizedAngle;
 
-        // as weird as it sounds, the atan function goes "Y,X" instead of "X,Y".
-        targetRotation = Math.atan2(controller.getLeftY(), controller.getLeftX());
-        swerveRotation = targetRotation * beltRatio;
+        if (Math.abs(controller.getLeftX()) > 0.05 || Math.abs(controller.getLeftY()) > 0.05) {
+            // as weird as it sounds, the atan function goes "Y,X" instead of "X,Y".
+            targetRotation = Math.toDegrees(Math.atan2(controller.getLeftY(), controller.getLeftX()));
+            normalizedAngle = (targetRotation + 180) / 360.0;
+            swerveRotation = normalizedAngle * pulleyRatio;
 
-        // sets the target rotation of the servos
-        frontLeftSteer.setPosition(swerveRotation);
-        frontRightSteer.setPosition(swerveRotation);
-        backLeftSteer.setPosition(swerveRotation);
-        backRightSteer.setPosition(swerveRotation);
+            // sets the target rotation of the servos
+            frontLeftSteer.setPosition(swerveRotation);
+            frontRightSteer.setPosition(swerveRotation);
+            backLeftSteer.setPosition(swerveRotation);
+            backRightSteer.setPosition(swerveRotation);
+        }
     }
 }

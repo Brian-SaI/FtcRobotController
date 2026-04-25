@@ -6,19 +6,25 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Commands.SwerveDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.CommandSwerveDriveTrain;
 import org.firstinspires.ftc.teamcode.Subsystems.SubsystemTest;
 
 @TeleOp(name = "Command Testing", group = "Experimental")
 public class RobotContainer extends CommandOpMode {
     private SubsystemTest subsystemTest;
-    private GamepadEx gamepad;
+    private CommandSwerveDriveTrain swerveDriveTrain = new CommandSwerveDriveTrain();
+    private final GamepadEx driverController = new GamepadEx(gamepad1);
+
+
+    SwerveDrive swerveCommand = new SwerveDrive(swerveDriveTrain, driverController);
 
     @Override
     public void initialize() {
-        subsystemTest = new SubsystemTest(hardwareMap);
-        gamepad = new GamepadEx(gamepad1);
 
-        gamepad.getGamepadButton(GamepadKeys.Button.A).whileHeld(new RunCommand(() -> subsystemTest.setPower(0.5), subsystemTest));
+        // swerve-drive commands
+        // lets the driver have continuous driver control.
+        swerveDriveTrain.setDefaultCommand(swerveCommand);
     }
 
 
