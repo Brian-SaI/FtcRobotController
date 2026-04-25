@@ -57,7 +57,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  *
  */
-@TeleOp(name = "Robot: Field Relative Swerve Drive", group = "Robot")
 @Disabled
 public class CommandSwerveDriveTrain extends SubsystemBase {
     // drive motors
@@ -153,6 +152,10 @@ public class CommandSwerveDriveTrain extends SubsystemBase {
     private void driveFieldRelative(GamepadEx controller) {
         drive(controller);
         steer(controller);
+    }
+
+    public void zeroGyro() {
+        imu.resetYaw();
     }
 
     public double spinSpeedCalculation(GamepadEx controller) {
