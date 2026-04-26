@@ -32,6 +32,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -102,9 +103,9 @@ public class CommandSwerveDriveTrain extends SubsystemBase {
         backRightDrive = hardwareMap.get(DcMotorEx.class, "back_right_drive");
         // sets up all the steer motors
         frontLeftSteer = hardwareMap.get(Servo.class, "front_left_steer");
-        frontRightSteer = hardwareMap.get(Servo.class, "front_left_steer");
-        backRightSteer = hardwareMap.get(Servo.class, "front_left_steer");
-        backLeftSteer = hardwareMap.get(Servo.class, "front_left_steer");
+        frontRightSteer = hardwareMap.get(Servo.class, "front_right_steer");
+        backRightSteer = hardwareMap.get(Servo.class, "back_right_steer");
+        backLeftSteer = hardwareMap.get(Servo.class, "back_left_steer");
 
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
@@ -144,6 +145,11 @@ public class CommandSwerveDriveTrain extends SubsystemBase {
 
     }
 
+    @Configurable
+    public static class RobotConstants {
+        public static double ahh = 40;
+    }
+
     public void gyroZero() {
         imu.resetYaw();
     }
@@ -162,7 +168,7 @@ public class CommandSwerveDriveTrain extends SubsystemBase {
         double maxTurnSpeed = 50;
 
         // turning should only apply to X-Axis. I think
-        double turnSpeed = controller.getLeftX();
+        double turnSpeed = controller.getRightX();
 
         if (Math.abs(turnSpeed) > 0.05) {
             return maxTurnSpeed * turnSpeed;
