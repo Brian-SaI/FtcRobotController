@@ -15,7 +15,6 @@ public class CommandTest extends CommandBase {
         this.power = power;
         this.durationSeconds = durationSeconds;
 
-        // This is exactly like FRC's addRequirements(subsystem);
         addRequirements(subsystem);
     }
 
