@@ -15,8 +15,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public ShooterSubsystem() {
 
-        LShooter = hardwareMap.get(DcMotorEx.class, "LeftShooter");
-        RShooter  = hardwareMap.get(DcMotorEx.class, "RightShooter");
+        LShooter = hardwareMap.get(DcMotorEx.class, "LShooter");
+        RShooter  = hardwareMap.get(DcMotorEx.class, "RShooter");
     }
 
     @Override
