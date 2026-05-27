@@ -55,6 +55,6 @@ public class RobotContainer extends CommandOpMode {
 
         // Uncomment these whenever your intake/outtake subsystems and commands are fully ready:
 
-        // manipulatorController.getGamepadButton(GamepadKeys.Button.X).whileHeld(outtakeCommand);
+        manipulatorController.getGamepadButton(GamepadKeys.Button.X).whileHeld(outtakeCommand);
     }
 }

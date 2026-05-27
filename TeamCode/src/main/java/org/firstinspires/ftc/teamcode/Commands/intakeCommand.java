@@ -22,14 +22,15 @@ public class intakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-    }
-
-    @Override
-    public void execute() {
         intakeSubsystem.runIntake(0.50);
         //indexer
 
         indexerSubsystem.runIndexer(0.50);
+    }
+
+    @Override
+    public void execute() {
+
 
     }
 
@@ -40,5 +41,9 @@ public class intakeCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        intakeSubsystem.runIntake(0);
+        //indexer
+
+        indexerSubsystem.runIndexer(0);
     }
 }

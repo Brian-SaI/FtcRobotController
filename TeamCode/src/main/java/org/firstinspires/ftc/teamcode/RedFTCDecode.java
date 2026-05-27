@@ -333,12 +333,12 @@ public class RedFTCDecode extends OpMode {
             }
             else if (result.getTx()>=txFar && result.isValid()) {
                 telemetry.addData("shooting: far!", limelightShooterSpeed);
-                PivotServo.setPosition(0.615);
+                PivotServo.setPosition(0.675);
                 limelightShooterSpeed = (float) farShoot;
             }
             else if (result.getTx()>=txExtraFar && result.isValid()){
                 telemetry.addData("shooting: extra-far!", limelightShooterSpeed);
-                PivotServo.setPosition(0.615);
+                PivotServo.setPosition(0.675);
                 limelightShooterSpeed = (float) extraFarShoot;
             }
         }
