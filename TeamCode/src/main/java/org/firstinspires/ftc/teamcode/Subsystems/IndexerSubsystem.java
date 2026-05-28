@@ -51,6 +51,9 @@ public class IndexerSubsystem extends SubsystemBase {
         topLeft = hMap.get(CRServo.class, "TopLServo");
         bottomRight = hMap.get(CRServo.class, "BottomRServo");
         bottomLeft = hMap.get(CRServo.class, "BottomLServo");
+
+        topRight.setDirection(CRServo.Direction.REVERSE);
+        bottomRight.setDirection(CRServo.Direction.REVERSE);
     }
 
     @Override

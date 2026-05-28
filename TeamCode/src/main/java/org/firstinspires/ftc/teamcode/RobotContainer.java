@@ -6,10 +6,12 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Commands.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Commands.OuttakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCommand;
 import org.firstinspires.ftc.teamcode.Commands.intakeCommand;
 // import org.firstinspires.ftc.teamcode.Subsystems.IndexerSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.CommandMecanumDriveTrain;
 import org.firstinspires.ftc.teamcode.Subsystems.IndexerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ShooterSubsystem;
@@ -21,6 +23,9 @@ public class RobotContainer extends CommandOpMode {
     private IntakeSubsystem intakeSubsystem;
     private IndexerSubsystem indexerSubsystem;
     private ShooterSubsystem shooterSubsystem;
+
+    private CommandMecanumDriveTrain driveTrain;
+    private MecanumDrive mecanumDriveCommand;
 
     // 2. Declare Commands
     private intakeCommand intakeCommand;
@@ -40,12 +45,15 @@ public class RobotContainer extends CommandOpMode {
         // 4. Initialize Subsystems (Pass hardwareMap here!)
         // (Assuming Intake and Indexer also take hardwareMap in their constructors)
         intakeSubsystem = new IntakeSubsystem(hardwareMap);
-        //indexerSubsystem = new IndexerSubsystem();
+        indexerSubsystem = new IndexerSubsystem(hardwareMap);
         shooterSubsystem = new ShooterSubsystem(hardwareMap);
+        driveTrain = new CommandMecanumDriveTrain(hardwareMap);
+
+        mecanumDriveCommand = new MecanumDrive(driveTrain, () -> -driverController.getLeftY(), () -> driverController.getLeftX(), () -> driverController.getRightX());
 
         // 5. Initialize Commands (Safe now because subsystems are no longer null)
         intakeCommand = new intakeCommand(intakeSubsystem, indexerSubsystem);
-        //outtakeCommand = new OuttakeCommand(intakeSubsystem, indexerSubsystem);
+        outtakeCommand = new OuttakeCommand(intakeSubsystem, indexerSubsystem);
         shootCommand = new ShootCommand(shooterSubsystem);
 
         manipulatorController.getGamepadButton(GamepadKeys.Button.Y).whileHeld(new RunCommand(() -> intakeSubsystem.runIntake(0.5), intakeSubsystem));
@@ -53,8 +61,12 @@ public class RobotContainer extends CommandOpMode {
         // 6. Assign Button Bindings
         manipulatorController.getGamepadButton(GamepadKeys.Button.A).whileHeld(shootCommand);
 
+        driveTrain.setDefaultCommand(mecanumDriveCommand);
+
         // Uncomment these whenever your intake/outtake subsystems and commands are fully ready:
 
         manipulatorController.getGamepadButton(GamepadKeys.Button.X).whileHeld(outtakeCommand);
+
+        driverController.getGamepadButton(GamepadKeys.Button.A).whenPressed(driveTrain::zeroGyro);
     }
 }
