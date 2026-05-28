@@ -56,7 +56,7 @@ public class RobotContainer extends CommandOpMode {
         outtakeCommand = new OuttakeCommand(intakeSubsystem, indexerSubsystem);
         shootCommand = new ShootCommand(shooterSubsystem);
 
-        manipulatorController.getGamepadButton(GamepadKeys.Button.Y).whileHeld(new RunCommand(() -> intakeSubsystem.runIntake(0.5), intakeSubsystem));
+        // manipulatorController.getGamepadButton(GamepadKeys.Button.Y).whileHeld(new RunCommand(() -> intakeSubsystem.runIntake(0.5), intakeSubsystem));
 
         // 6. Assign Button Bindings
         manipulatorController.getGamepadButton(GamepadKeys.Button.A).whileHeld(shootCommand);
@@ -66,6 +66,8 @@ public class RobotContainer extends CommandOpMode {
         // Uncomment these whenever your intake/outtake subsystems and commands are fully ready:
 
         manipulatorController.getGamepadButton(GamepadKeys.Button.X).whileHeld(outtakeCommand);
+
+        manipulatorController.getGamepadButton(GamepadKeys.Button.Y).whileHeld(intakeCommand);
 
         driverController.getGamepadButton(GamepadKeys.Button.A).whenPressed(driveTrain::zeroGyro);
     }

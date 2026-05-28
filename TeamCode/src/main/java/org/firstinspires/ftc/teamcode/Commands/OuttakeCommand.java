@@ -25,10 +25,11 @@ IndexerSubsystem indexerSubsystem;
 
     @Override
     public void execute() {
-        intakeSubsystem.runIntake(-0.50);
+        intakeSubsystem.runIntake(-1);
         //indexer
 
-        indexerSubsystem.runIndexer(-0.50);
+        indexerSubsystem.runIndexer(-1);
+
     }
 
     @Override
@@ -38,5 +39,8 @@ IndexerSubsystem indexerSubsystem;
 
     @Override
     public void end(boolean interrupted) {
+        intakeSubsystem.runIntake(-0.00);
+
+        indexerSubsystem.runIndexer(-0.00);
     }
 }

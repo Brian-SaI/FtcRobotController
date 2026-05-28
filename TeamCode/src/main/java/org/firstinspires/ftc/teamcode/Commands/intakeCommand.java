@@ -22,10 +22,10 @@ public class intakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        intakeSubsystem.runIntake(0.50);
+        intakeSubsystem.runIntake(1);
         //indexer
 
-        indexerSubsystem.runIndexer(0.50);
+        indexerSubsystem.runIndexer(1);
     }
 
     @Override
